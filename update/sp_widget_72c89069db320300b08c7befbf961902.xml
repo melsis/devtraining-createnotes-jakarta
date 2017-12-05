@@ -4,23 +4,24 @@
         <client_script><![CDATA[function($rootScope,$scope) {
 	/* widget controller */
 	var c = this;
+	c.notePos =0; // remember the position of note in list
 	// Lets emit the NoteId of selected note to another widget
-	var notepos = 0;
+	
 	c.selectItem = function(index){
 		// Sys id of note
+		c.notePos = index;
 		var noteID = c.data.notes[index].sys_id;
-		notepos = index;
+
 		$rootScope.noteID = noteID;
 		$rootScope.$emit('selectNote',noteID);
 	}
 	
+	// subscribe on updatednote
 	$rootScope.$on('updatedNote', function(event,data){
-		c.server.get({
-			action: updateNote,
-			noteID: $rootscope.noteID
-		}).then(function(r){
-			c.data.notes[notepos].title = data.notes[notepos].title;
-		});
+		console.log(data);
+		// once we get update event
+		c.data.notes[c.notePos].title = data.title;
+		c.data.notes[c.notePos].note = data.note;
 	});
 
 }]]></client_script>
@@ -62,11 +63,7 @@
 		data.notes.push(noteObj);
 	}
 	
-	if (input && input.noteID){
-		if (input.action == 'updateNote'){
-			
-		}
-	}
+
 
 })();]]></script>
         <servicenow>false</servicenow>
@@ -74,14 +71,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-02 12:45:43</sys_created_on>
         <sys_id>72c89069db320300b08c7befbf961902</sys_id>
-        <sys_mod_count>38</sys_mod_count>
+        <sys_mod_count>42</sys_mod_count>
         <sys_name>Notes List</sys_name>
         <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
         <sys_policy/>
         <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
         <sys_update_name>sp_widget_72c89069db320300b08c7befbf961902</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-05 12:49:55</sys_updated_on>
+        <sys_updated_on>2017-12-05 13:31:06</sys_updated_on>
         <template><![CDATA[<div class="panel panel-default">
   <div class="panel-heading clearfix">
     <h3 class="panel-title pull-left">
