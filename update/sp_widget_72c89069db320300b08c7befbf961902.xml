@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <client_script><![CDATA[function($rootScope,$scope) {
+	/* widget controller */
+	var c = this;
+	// Lets emit the NoteId of selected note to another widget
+	c.selectItem = function(index){
+		// Sys id of note
+		var noteID = c.data.notes[index].sys_id;
+		
+		$rootScope.noteID = noteID;
+		$rootScope.$emit('selectNote',noteID);
+	}
+	
+	$rootScope.$on('updatedNote', function(event,data){
+		c.server.get({
+			action: updateNote,
+			noteID: $rootscope.noteID
+		}).then(function(r){
+			c.data.notes = r.data.notes;
+		});
+	});
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>notes_list</id>
+        <internal>false</internal>
+        <link/>
+        <name>Notes List</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+	/* populate the 'data' object */
+	/* e.g., data.table = $sp.getValue('table'); */
+	data.notes = []; // lets have array of note objects
+
+	// get notes for current user
+	var noteGR = new GlideRecord('x_snc_createnotes_note');
+	noteGR.addQuery('user',gs.getUserID());
+	noteGR.orderByDesc('sys_updated_on');// sorting by update
+	noteGR.query();
+	while(noteGR.next()){
+		// Object note to populate and push into note array
+		var noteObj = {};
+		// We need service portal helper $sp 
+		// getting display values of records
+		$sp.getRecordDisplayValues(noteObj,noteGR,'number,title,sys_id,sys_created_on,sys_updated_on');
+    //get the note body
+		
+		noteObj.note = noteGR.getValue('note').slice(0,30);
+		// lets push the object into the array
+		data.notes.push(noteObj);
+	}
+	
+	if (input && input.noteID){
+		if (input.action == 'updateNote'){
+			data.notes = []; // lets have array of note objects
+
+	// get notes for current user
+	var unoteGR = new GlideRecord('x_snc_createnotes_note');
+	unoteGR.addQuery('user',gs.getUserID());
+	unoteGR.orderByDesc('sys_updated_on');// sorting by update
+	unoteGR.query();
+	while(unoteGR.next()){
+		// Object note to populate and push into note array
+		var unoteObj = {};
+		// We need service portal helper $sp 
+		// getting display values of records
+		$sp.getRecordDisplayValues(unoteObj,unoteGR,'number,title,sys_id,sys_created_on,sys_updated_on');
+    //get the note body
+		
+		unoteObj.note = unoteGR.getValue('note').slice(0,30);
+		// lets push the object into the array
+		data.notes.push(unoteObj);
+	}
+		}
+	}
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-12-02 12:45:43</sys_created_on>
+        <sys_id>72c89069db320300b08c7befbf961902</sys_id>
+        <sys_mod_count>35</sys_mod_count>
+        <sys_name>Notes List</sys_name>
+        <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
+        <sys_update_name>sp_widget_72c89069db320300b08c7befbf961902</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-12-05 12:00:43</sys_updated_on>
+        <template><![CDATA[<div class="panel panel-default">
+  <div class="panel-heading clearfix">
+    <h3 class="panel-title pull-left">
+      ${Notes Header}
+    </h3>
+  </div>
+  <div class="panel-body" >
+    <div class="list-group" ng-click="c.selectItem($index)" ng-repeat="note in data.notes">
+      <a class="list-group-item">
+        <h4 class="list-group-item-heading">
+          {{note.title}}
+          <small class="text-muted">${Created: }{{note.sys_created_on | date:'shortDate'}}
+          </small>
+        </h4>
+        <p>
+          {{note.note}}${...}
+        </p>
+        <p>
+          <small class="text-muted">${Updated: }{{note.sys_updated_on | date:'shortDate'}}
+          </small>
+        </p>
+      </a>
+    </div>   
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>
