@@ -5,10 +5,11 @@
 	/* widget controller */
 	var c = this;
 	// Lets emit the NoteId of selected note to another widget
+	var notepos = 0;
 	c.selectItem = function(index){
 		// Sys id of note
 		var noteID = c.data.notes[index].sys_id;
-		
+		notepos = index;
 		$rootScope.noteID = noteID;
 		$rootScope.$emit('selectNote',noteID);
 	}
@@ -18,7 +19,7 @@
 			action: updateNote,
 			noteID: $rootscope.noteID
 		}).then(function(r){
-			c.data.notes = r.data.notes;
+			c.data.notes[notepos].title = data.notes[notepos].title;
 		});
 	});
 
@@ -63,25 +64,7 @@
 	
 	if (input && input.noteID){
 		if (input.action == 'updateNote'){
-			data.notes = []; // lets have array of note objects
-
-	// get notes for current user
-	var unoteGR = new GlideRecord('x_snc_createnotes_note');
-	unoteGR.addQuery('user',gs.getUserID());
-	unoteGR.orderByDesc('sys_updated_on');// sorting by update
-	unoteGR.query();
-	while(unoteGR.next()){
-		// Object note to populate and push into note array
-		var unoteObj = {};
-		// We need service portal helper $sp 
-		// getting display values of records
-		$sp.getRecordDisplayValues(unoteObj,unoteGR,'number,title,sys_id,sys_created_on,sys_updated_on');
-    //get the note body
-		
-		unoteObj.note = unoteGR.getValue('note').slice(0,30);
-		// lets push the object into the array
-		data.notes.push(unoteObj);
-	}
+			
 		}
 	}
 
@@ -91,14 +74,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2017-12-02 12:45:43</sys_created_on>
         <sys_id>72c89069db320300b08c7befbf961902</sys_id>
-        <sys_mod_count>35</sys_mod_count>
+        <sys_mod_count>38</sys_mod_count>
         <sys_name>Notes List</sys_name>
         <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
         <sys_policy/>
         <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
         <sys_update_name>sp_widget_72c89069db320300b08c7befbf961902</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2017-12-05 12:00:43</sys_updated_on>
+        <sys_updated_on>2017-12-05 12:49:55</sys_updated_on>
         <template><![CDATA[<div class="panel panel-default">
   <div class="panel-heading clearfix">
     <h3 class="panel-title pull-left">
